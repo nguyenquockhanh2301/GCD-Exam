@@ -95,15 +95,23 @@
         }
         th, td {
             padding: 8px 10px;
-            border: 1px solid #e5a48a;
+            border: none;
             text-align: left;
         }
-        thead {
-            background-color: #e88254;
+        thead tr {
+            background-color: #d8683c;
             color: white;
         }
-        tbody tr:nth-child(even) {
-            background-color: #fff7f3;
+        thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        tbody tr {
+            background-color: transparent;
         }
         .actions a {
             margin-right: 8px;
@@ -115,6 +123,32 @@
             margin-bottom: 15px;
         }
         .errors ul { margin: 0; padding-left: 18px; }
+        .pagination {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+        .pagination a {
+            color: #d8683c;
+            text-decoration: none;
+            border: 1px solid #d8683c;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .pagination span {
+            color: #555;
+        }
+        .footer-bar {
+            margin-top: 30px;
+            background-color: #d8683c;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -200,6 +234,28 @@
         } %>
         </tbody>
     </table>
+
+    <%
+        Integer currentPageObj = (Integer) request.getAttribute("currentPage");
+        Integer totalPagesObj = (Integer) request.getAttribute("totalPages");
+        int currentPageVal = currentPageObj != null ? currentPageObj : 1;
+        int totalPagesVal = totalPagesObj != null ? totalPagesObj : 1;
+    %>
+    <% if (totalPagesVal > 1) { %>
+        <div class="pagination">
+            <% if (currentPageVal > 1) { %>
+                <a href="<%= request.getContextPath() %>/players?page=<%= currentPageVal - 1 %>">&laquo; Prev</a>
+            <% } %>
+            <span>Page <%= currentPageVal %> of <%= totalPagesVal %></span>
+            <% if (currentPageVal < totalPagesVal) { %>
+                <a href="<%= request.getContextPath() %>/players?page=<%= currentPageVal + 1 %>">Next &raquo;</a>
+            <% } %>
+        </div>
+    <% } %>
+
+    <div class="footer-bar">
+        Số 8, Tôn Thất Thuyết, Cầu Giấy, Hà Nội
+    </div>
 </div>
 </body>
 </html>

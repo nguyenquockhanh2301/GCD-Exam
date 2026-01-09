@@ -10,27 +10,42 @@ import java.util.List;
 
 public class PlayerIndexDao {
 
-    public List<PlayerIndexView> findAllWithJoin() throws SQLException {
+    public int countAll() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM player_index";
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public List<PlayerIndexView> findPageWithJoin(int offset, int limit) throws SQLException {
         String sql = "SELECT pi.id, pi.player_id, pi.index_id, pi.value, " +
                 "p.name AS player_name, p.age AS player_age, i.name AS index_name " +
                 "FROM player_index pi " +
                 "JOIN player p ON pi.player_id = p.player_id " +
                 "JOIN indexer i ON pi.index_id = i.index_id " +
-                "ORDER BY pi.id";
+                "ORDER BY pi.id LIMIT ? OFFSET ?";
         List<PlayerIndexView> list = new ArrayList<>();
         try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                PlayerIndexView v = new PlayerIndexView();
-                v.setId(rs.getInt("id"));
-                v.setPlayerId(rs.getInt("player_id"));
-                v.setIndexId(rs.getInt("index_id"));
-                v.setPlayerName(rs.getString("player_name"));
-                v.setPlayerAge(rs.getInt("player_age"));
-                v.setIndexName(rs.getString("index_name"));
-                v.setValue(rs.getFloat("value"));
-                list.add(v);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    PlayerIndexView v = new PlayerIndexView();
+                    v.setId(rs.getInt("id"));
+                    v.setPlayerId(rs.getInt("player_id"));
+                    v.setIndexId(rs.getInt("index_id"));
+                    v.setPlayerName(rs.getString("player_name"));
+                    v.setPlayerAge(rs.getInt("player_age"));
+                    v.setIndexName(rs.getString("index_name"));
+                    v.setValue(rs.getFloat("value"));
+                    list.add(v);
+                }
             }
         }
         return list;

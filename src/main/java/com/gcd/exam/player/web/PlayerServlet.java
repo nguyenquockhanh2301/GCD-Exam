@@ -74,10 +74,37 @@ public class PlayerServlet extends HttpServlet {
 
     private void list(HttpServletRequest req, HttpServletResponse resp) throws SQLException, ServletException, IOException {
         List<Indexer> indexers = indexerDao.findAll();
-        List<PlayerIndexView> playerIndexes = playerIndexDao.findAllWithJoin();
+
+        // Simple pagination: 10 records per page
+        final int pageSize = 10;
+        int page = 1;
+        String pageParam = req.getParameter("page");
+        if (pageParam != null) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        int totalRecords = playerIndexDao.countAll();
+        int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
+        if (totalPages < 1) {
+            totalPages = 1;
+        }
+        if (page > totalPages) {
+            page = totalPages;
+        }
+        int offset = (page - 1) * pageSize;
+
+        List<PlayerIndexView> playerIndexes = playerIndexDao.findPageWithJoin(offset, pageSize);
 
         req.setAttribute("indexers", indexers);
         req.setAttribute("playerIndexes", playerIndexes);
+        req.setAttribute("currentPage", page);
+        req.setAttribute("totalPages", totalPages);
         if (req.getAttribute("formMode") == null) {
             req.setAttribute("formMode", "create");
         }
