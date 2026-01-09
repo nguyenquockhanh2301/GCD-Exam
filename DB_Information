@@ -1,0 +1,34 @@
+Database information(script):
+CREATE DATABASE IF NOT EXISTS player_evaluation;
+USE player_evaluation;
+CREATE TABLE `indexer` (
+`index_id` int(11) AUTO_INCREMENT NOT NULL,
+`name` varchar(64) NOT NULL,
+`valueMin` float NOT NULL,
+`valueMax` float NOT NULL,
+PRIMARY KEY (`index_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE `player` (
+`player_id` int(11) NOT NULL AUTO_INCREMENT,
+`name` varchar(64) NOT NULL,
+`full_name` varchar(128) NOT NULL,
+`age` varchar(10) NOT NULL,
+`index_id` int(11) NOT NULL,
+PRIMARY KEY (`player_id`),
+FOREIGN KEY (`index_id`) REFERENCES `indexer`(`index_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE `player_index` (
+`id` int(11) AUTO_INCREMENT NOT NULL,
+`player_id` int(11) NOT NULL,
+`index_id` int(11) NOT NULL,
+`value` float NOT NULL,
+PRIMARY KEY (`id`),
+FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`),
+FOREIGN KEY (`index_id`) REFERENCES `indexer`(`index_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+insert into indexer (name, valueMin, valueMax)
+values ('speed',10,100);
+insert into indexer (name, valueMin, valueMax)
+values ('strength',0,10);
+insert into indexer (name, valueMin, valueMax)
+values ('accurate',0,1);
