@@ -1,4 +1,3 @@
-Database information(script):
 CREATE DATABASE IF NOT EXISTS player_evaluation;
 USE player_evaluation;
 CREATE TABLE `indexer` (
